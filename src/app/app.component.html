@@ -1,0 +1,110 @@
+
+<div class="container my-5">
+
+  <div class="row no-gutters">
+    <div class="col-xs-12">
+      <h3>HttpClient Module (<a href='https://github.com/jelkada/httpclient' target="'_blank">see on github</a>)</h3>
+      <ul class="FontSize14">
+        <li>The HttpClient Module provides mechanisms and wrappers for making http requests from an SPA Angular application.</li>
+        <li>With Angular SPA we do not reload the page with every server request. The HttpClient Module uses ajax to send/receive data without reloading the page.<li>
+        <li>The example below shows the use of various methods and features of the HttpClient Module for sending and receiving HTTP requests.</li>
+        <li>The example uses Realtime database for demonstrating Http calls (Realtime DB is Google’s Firebase platform for developing mobile/web apps).</li>
+        <li>The http requests are wrapped in a dedicated service component, called httpService, as it is best to keep together all http related functionalities.</li>
+        <li>The example shows that the component needs to subscribe to the http request observable return value, in order to  trigger the http request and get/process the data.</li>
+        <li>The “appName” value shows an example of async pipe that implicitly subscribes to the HTTP observable and trigger the get request.</li>
+        <li>The books data is filtered using a map operation on the get() method and returns array of books filtered by language (first 4 books).</li>
+        <li>Http Interceptors are used to demonstrate how to intercept and modify http outgoing requests and incoming responses.</li>
+        <li>When interceptors are registered via the HTTP_INTERCEPTORS array they apply globally to all incoming and outgoing http communication.</li>
+        <li>This example uses Google’s free Realtime Database to save and retrieve data from the server.</li>
+        <li>A ServersService class is used to centralize all HttpClient Module tasks for better encapsulation and maintainability.</li>
+        <li>Inspect console.log to see the behaviour of various HttpClient methods and interceptors (such as Authorization in header request).</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr/>
+
+  <div class="row">
+    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+
+      appName (get method with async pipe): {{ appName | async }}
+
+      <hr/>
+
+      <input type="text" #serverName>
+      <button class="btn btn-primary ml-3" (click)="onAddServer(serverName.value)">Add Server</button>
+
+      <hr/>
+
+      <button class="btn btn-primary" (click)="onSave()">Save Servers</button>
+      <button class="btn btn-primary ml-3" (click)="onGet()">Get Servers</button>
+
+      <hr/>
+
+      <ul class="list-group" *ngFor="let server of servers">
+        <li class="list-group-item mb-3">{{ server.name }} (ID: {{ server.id }})</li>
+      </ul>
+
+      <hr/>
+
+      Select language - filter to get() the first 4 books (using map operation):
+      <select class="custom-select w-50 d-inline-block my-2"
+              (change)="onChangeLanguage()"
+              [(ngModel)]="selectedLanguage">
+        <option value="All">All</option>
+        <option value="English">English</option>
+        <option value="French">French</option>
+        <option value="Russian">Russian</option>
+        <option value="Chinese">Chinese</option>
+      </select>
+
+      <ul class="list-group" *ngIf="books">
+        <li class="list-group-item my-1 FontSize14"
+            *ngFor="let book of books | showFirst:4">
+          <span class="badge badge-secondary float-right">{{ book.language }}</span>
+          <strong>{{ book.title }}</strong><br/>
+          {{ book.author }} / {{ book.language }} / {{ book.country }}
+        </li>
+      </ul>
+
+
+    </div>
+  </div>
+
+  <hr class="mt-3"/>
+
+  <div class="row no-gutters">
+    <div class="col-xs-12 ng-non-bindable">
+      <h4 class="mt-3">HttpClient Module basics:</h4>
+      <ul>
+        <li>Angular 4.3 introduced the new HttpClient service which replaced the Http service from Angular 2.</li>
+        <li>The HttpClient module works with Observable classes of the rxjs library in order to run a callback each time an Http request is submitted.</li>
+        <li>The HttpClient return value is thus an observable which is a JS object that handles asynchronous data.</li>
+        <li>The main HttpClient methods are get(), post(), put(), patch(), delete() and request().</li>
+        <li>To get the data from the HttpClient service, the component receiving that data needs to subscribe to the observable.</li>
+        <li>The subscribe() method takes 3 arguments which are event handlers: onNext, onError and onComplete.</li>
+        <li>For multiple http requests, we need to delay execution until all data is loaded from multiple sources. In this case, use the observable’s forkJoin() to wrap multiple http requests.</li>
+        <li>JSON is now the assumed default response type and no longer needs to be parsed explicitly.</li>
+        <li>Interceptors are a new feature of the HttpClient that allows for a front-end middleware logic to be inserted in the pipeline.</li>
+        <li>Interceptors are the layer between our Angular application and the back-end services - before sending a request and after receiving a response.</li>
+        <li>Interceptors can be useful for features like authentication using tokens, caching data and logging.</li>
+      </ul>
+      <h4 class="mt-3">HttpClient Module - usage guidelines:</h4>
+      <ul>
+        <li>In order to use the HttpClient, we need to import and declare the Angular HttpClientModule in the root AppModule.<br/>import &#123; HttpClientModule &#125; from '@angular/common/http’;<br/>@NgModule(&#123; imports: [ HttpClientModule ] &#125;)</li>
+        <li>Having the HttpClientModule in the App Module, you can then inject it in your class.<br/>@Injectable() export class ClassName &#123; constructor(private http: HttpClient)&#123;&#125; &#125;</li>
+        <li>Add to your class these two imports:<br/>import &#123; Injectable &#125; from '@angular/core’;<br/>import &#123; HttpClient &#125; from '@angular/common/http';</li>
+        <li>Use the http() method of the HttpClient to get/post/put/patch/delete your data.</li>
+        <li>It is a best practice to separate presentation of data from data access by encapsulating the HttpClient data access in a separate service and delegating to that service in the component.</li>
+        <li>We can add custom HTTP headers to the HTTP requests using the HttpHeaders class.</li>
+        <li>We can feed HTTP parameters to the API endpoint we are querying using the HttpParams class to use parameters in the HttpClient module.</li>
+        <li>Perhaps one of the most useful is the new HttpInterceptor interface which allows us to modify outgoing requests and incoming responses.</li>
+        <li>This feature greatly simplifies a lot of previously tricky operations and removes the need for a lot of class wrappers that have been around since the early days of Angular 2.</li>
+        <li>To set up interceptor we add an injectable class and we need to implement the HttpInterceptor interface’s intercept() method.</li>
+        <li>The interceptor needs to be added to the HTTP_INTERCEPTORS array in the main app module. The order in which we register the interceptors is important</li>
+        <li>When we make any HTTP request interceptors are attached automatically and added to all requests globally.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
